@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าบิล</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- เพิ่ม SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <h1>อิ่มไหม Buffet</h1>
+        <nav>
+            <ul>
+                <li><a href="#">อาหารสด</a></li>
+                <li><a href="#">ผัก</a></li>
+                <li><a href="#">ของทานเล่น</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="bill-container">
+        <h2 class="bill-header">รายการอาหารที่เลือก</h2>
+        <div class="bill-details">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ชื่อรายการ</th>
+                        <th>จำนวน</th>
+                        <th>ราคา</th>
+                    </tr>
+                </thead>
+                <tbody id="bill-items">
+                    <!-- รายการอาหารจะถูกเติมเข้ามาโดย JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div class="bill-summary">
+            <p><strong>รวมทั้งหมด:</strong> <span id="total-price">0</span> บาท</p>
+            <p><strong>ส่วนลด 10%:</strong> <span id="discount-price">0</span> บาท</p>
+            <p class="total"><strong>รวมทั้งสิ้น:</strong> <span id="final-price">0</span> บาท</p>
+        </div>
+        <center>
+            <button class="next-button" onclick="goToPayment()">ถัดไป</button>
+            <button class="next-button" onclick="goToIndex()">ย้อนกลับ</button>
+        </center>
+        
+    </main>
+
+    <footer>
+        <p>Copyright© 2022 IMMAI BUFFET. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        window.onload = function() {
+            // ดึงข้อมูลจาก localStorage
+            var selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+            
+            // ตรวจสอบว่าไม่มีรายการอะไรเลือก
+            if (selectedItems.length === 0) {
+                document.getElementById('bill-items').innerHTML = '<tr><td colspan="4">ยังไม่มีรายการที่เลือก</td></tr>';
+                return;
+            }
+
+            // แสดงรายการอาหารที่เลือก
+            var billItemsHTML = '';
+            var totalPrice = 0;
+            selectedItems.forEach(function(item, index) {
+                if (item.quantity > 0) {
+                    var itemTotalPrice = item.price * item.quantity;
+                    totalPrice += itemTotalPrice;
+
+                    billItemsHTML += '<tr>';
+                    billItemsHTML += '<td>' + (index + 1) + '</td>';
+                    billItemsHTML += '<td>' + item.name + '</td>';
+                    billItemsHTML += '<td>' + item.quantity + '</td>';
+                    billItemsHTML += '<td>' + itemTotalPrice + ' บาท</td>';
+                    billItemsHTML += '</tr>';
+                }
+            });
+
+            document.getElementById('bill-items').innerHTML = billItemsHTML;
+
+            // คำนวณส่วนลด 10%
+            var discountPrice = totalPrice * 0.1;
+            var finalPrice = totalPrice - discountPrice;
+
+            // แสดงผลรวมทั้งหมด
+            document.getElementById('total-price').innerText = totalPrice;
+            document.getElementById('discount-price').innerText = discountPrice;
+            document.getElementById('final-price').innerText = finalPrice;
+        };
+
+        function goToPayment() {
+            // ตรวจสอบการยืนยันจากผู้ใช้ก่อนเปลี่ยนหน้า
+            Swal.fire({
+                title: 'ยืนยันการชำระเงิน?',
+                text: "คุณต้องการดำเนินการชำระเงินหรือไม่?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ทำการไปหน้าชำระเงิน
+                    window.location.href = 'payment.html';  // เปลี่ยนไปที่หน้าชำระเงิน
+                }
+            });
+        }
+        function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าชำระเงิน</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="navbar">
+        <h1>อิ่มไหม Buffet</h1>
+        <nav>
+            <ul>
+                <li><a href="#fresh-menu">อาหารสด</a></li>
+                <li><a href="#vegetable-menu">ผัก</a></li>
+                <li><a href="#snack-menu">ของทานเล่น</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="payment-container">
+        <h2 class="payment-header">ยอดชำระ</h2>
+        <div class="payment-summary">
+            <div class="summary-row">
+                <span>จำนวนอาหาร</span>
+                <span id="total-items">0 รายการ</span>
+            </div>
+            <div class="summary-row">
+                <span>รวมทั้งหมด</span>
+                <span id="total-price">0 บาท</span>
+            </div>
+            <div class="summary-row">
+                <span>ส่วนลด 10%</span>
+                <span id="discount-price">0 บาท</span>
+            </div>
+            <div class="summary-row total">
+                <span>ลดเหลือ</span>
+                <span id="final-price">0 บาท</span>
+            </div>
+        </div>
+        <button class="confirm-button" onclick="confirmPayment()">ยืนยันการชำระ</button>
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 2022 IMMAI? SHABU BUFFET. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        window.onload = function () {
+            // ดึงข้อมูลจาก localStorage
+            var selectedItems = JSON.parse(localStorage.getItem('selectedItems')) || [];
+            
+            // คำนวณยอดทั้งหมด
+            var totalPrice = 0;
+            var totalItems = 0;
+
+            selectedItems.forEach(function (item) {
+                if (item.quantity > 0) {
+                    totalItems += item.quantity;
+                    totalPrice += item.price * item.quantity;
+                }
+            });
+
+            // คำนวณส่วนลด 10%
+            var discountPrice = totalPrice * 0.1;
+            var finalPrice = totalPrice - discountPrice;
+
+            // แสดงผล
+            document.getElementById('total-items').innerText = totalItems + ' รายการ';
+            document.getElementById('total-price').innerText = totalPrice + ' บาท';
+            document.getElementById('discount-price').innerText = discountPrice + ' บาท';
+            document.getElementById('final-price').innerText = finalPrice + ' บาท';
+        };
+
+        function confirmPayment() {
+            // ใช้ SweetAlert2 เพื่อแสดงการยืนยัน
+            Swal.fire({
+                title: 'ยืนยันการชำระเงิน?',
+                text: 'คุณต้องการดำเนินการชำระเงินหรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // การยืนยันการชำระเงินแล้ว
+                    Swal.fire({
+                        title: 'ชำระเงินสำเร็จ!',
+                        text: 'คุณได้ทำการชำระเงินเรียบร้อยแล้ว',
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
+                    }).then(() => {
+                        // สามารถเปลี่ยนไปหน้าอื่น เช่น หน้าเสร็จสิ้น
+                        window.location.href = 'index.html';  // หน้า ขอบคุณ
+                    });
+                } else {
+                    // หากยกเลิกการชำระเงิน
+                    Swal.fire({
+                        title: 'ยกเลิกการชำระเงิน',
+                        text: 'คุณยกเลิกการชำระเงินแล้ว',
+                        icon: 'info',
+                        confirmButtonText: 'ตกลง'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
